@@ -1,0 +1,33 @@
+# Entorno virtual
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Django
+ejercicio_3_auditoria_web/db.sqlite3
+ejercicio_3_auditoria_web/staticfiles/
+*.log
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Archivos generados por los scripts
+# (catalogo_ecotech.json se incluye a proposito como evidencia del Ejercicio 2)
+
+# Guion interno (no se sube a GitHub)
+guion.md
+
+# Editores y sistema
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+#

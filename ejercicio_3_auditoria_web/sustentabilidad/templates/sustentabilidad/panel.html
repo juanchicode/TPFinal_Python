@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Panel de sustentabilidad de EcoTech Solutions: emisiones de carbono y consumo por planta.">
+  <title>Panel de Sustentabilidad - EcoTech Solutions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --fondo: #0b1220;
+      --tarjeta: rgba(30, 41, 59, 0.72);
+      --texto: #f8fafc;
+      --texto-suave: #94a3b8;
+      --borde: rgba(148, 163, 184, 0.16);
+      --verde: #10b981;
+      --verde-brillo: rgba(16, 185, 129, 0.35);
+      --ambar: #f59e0b;
+      --ambar-brillo: rgba(245, 158, 11, 0.35);
+      --azul: #3b82f6;
+      --azul-brillo: rgba(59, 130, 246, 0.35);
+      --radio: 20px;
+      --curva: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--texto);
+      min-height: 100vh;
+      padding: 40px 20px;
+      background:
+        radial-gradient(900px 500px at 12% -8%, rgba(16, 185, 129, 0.16), transparent 60%),
+        radial-gradient(800px 500px at 100% 0%, rgba(59, 130, 246, 0.14), transparent 55%),
+        radial-gradient(700px 600px at 50% 110%, rgba(245, 158, 11, 0.10), transparent 60%),
+        var(--fondo);
+      background-attachment: fixed;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Fondo animado con Three.js (decorativo) */
+    #lienzo {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.55;
+    }
+
+    .contenedor {
+      position: relative;
+      z-index: 1;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    /* ---------- Cabecera ---------- */
+    .cabecera {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 36px;
+      animation: subir 0.7s var(--curva) both;
+    }
+
+    .marca {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--verde);
+      margin-bottom: 10px;
+    }
+
+    .cabecera h1 {
+      font-size: clamp(1.9rem, 4vw, 2.7rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      background: linear-gradient(100deg, #ffffff 20%, #94a3b8 90%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+    }
+
+    .cabecera-sub {
+      margin-top: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--texto-suave);
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #d1fae5;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .punto {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--verde);
+      box-shadow: 0 0 0 0 var(--verde-brillo);
+      animation: latido 2s ease-out infinite;
+    }
+
+    /* ---------- Tarjetas KPI ---------- */
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 22px;
+      margin-bottom: 34px;
+    }
+
+    .kpi {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 26px;
+      background: var(--tarjeta);
+      border: 1px solid var(--borde);
+      border-radius: var(--radio);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 10px 34px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+      transition: transform 0.35s var(--curva), box-shadow 0.35s var(--curva), border-color 0.35s;
+      animation: subir 0.7s var(--curva) both;
+    }
+
+    .kpi:nth-child(1) { animation-delay: 0.08s; }
+    .kpi:nth-child(2) { animation-delay: 0.18s; }
+    .kpi:nth-child(3) { animation-delay: 0.28s; }
+
+    .kpi::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--acento, var(--verde)), transparent);
+      opacity: 0.9;
+    }
+
+    .kpi:hover {
+      transform: translateY(-6px);
+      border-color: rgba(148, 163, 184, 0.3);
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+    }
+
+    .kpi-verde   { --acento: var(--verde); }
+    .kpi-ambar   { --acento: var(--ambar); }
+    .kpi-azul    { --acento: var(--azul); }
+
+    .kpi-superior {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .kpi-titulo {
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--texto-suave);
+    }
+
+    .icono {
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      transition: transform 0.35s var(--curva), box-shadow 0.35s;
+    }
+
+    .icono svg { width: 22px; height: 22px; }
+
+    .icono-verde { color: var(--verde); background: rgba(16, 185, 129, 0.14); box-shadow: 0 0 22px var(--verde-brillo); }
+    .icono-ambar { color: var(--ambar); background: rgba(245, 158, 11, 0.14); box-shadow: 0 0 22px var(--ambar-brillo); }
+    .icono-azul  { color: var(--azul);  background: rgba(59, 130, 246, 0.14); box-shadow: 0 0 22px var(--azul-brillo); }
+
+    .kpi:hover .icono { animation: flotar 1.6s ease-in-out infinite; }
+
+    .kpi-valor {
+      font-size: clamp(1.9rem, 3vw, 2.4rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .kpi-valor small {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--texto-suave);
+      letter-spacing: 0;
+    }
+
+    .kpi-valor-texto {
+      font-size: clamp(1.15rem, 2vw, 1.4rem);
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--ambar);
+    }
+
+    .kpi-pie {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.83rem;
+      font-weight: 500;
+      color: var(--texto-suave);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .kpi-pie svg { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.8; }
+
+    /* ---------- Panel / tabla ---------- */
+    .panel {
+      background: var(--tarjeta);
+      border: 1px solid var(--borde);
+      border-radius: var(--radio);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 10px 34px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+      animation: subir 0.7s var(--curva) 0.38s both;
+    }
+
+    .panel-cabecera {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 22px 26px;
+      border-bottom: 1px solid var(--borde);
+    }
+
+    .panel-cabecera h2 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .panel-cabecera h2 svg { width: 18px; height: 18px; color: var(--verde); }
+
+    .panel-meta {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--texto-suave);
+      background: rgba(148, 163, 184, 0.1);
+      border: 1px solid var(--borde);
+      padding: 5px 12px;
+      border-radius: 999px;
+    }
+
+    .tabla-scroll { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      min-width: 560px;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .visualmente-oculto {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    thead th {
+      padding: 14px 26px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--texto-suave);
+      background: rgba(11, 18, 32, 0.55);
+      border-bottom: 1px solid var(--borde);
+    }
+
+    tbody tr {
+      animation: aparecer 0.5s ease both;
+      animation-delay: calc(var(--i, 0) * 70ms + 0.5s);
+      transition: background-color 0.25s ease;
+    }
+
+    tbody tr:hover { background-color: rgba(255, 255, 255, 0.045); }
+
+    tbody td {
+      padding: 18px 26px;
+      font-size: 0.95rem;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td { border-bottom: none; }
+
+    .num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+    }
+
+    .planta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-weight: 600;
+    }
+
+    .insignia {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      font-size: 0.66rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #fde68a;
+      background: rgba(245, 158, 11, 0.16);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .insignia svg { width: 11px; height: 11px; }
+
+    .lider { background-color: rgba(245, 158, 11, 0.07); }
+    .lider:hover { background-color: rgba(245, 158, 11, 0.11) !important; }
+    .lider td { color: #fde68a; font-weight: 700; }
+    .lider .planta { color: var(--texto); }
+
+    .medidor { display: flex; flex-direction: column; gap: 7px; }
+
+    .pista {
+      display: block;
+      height: 6px;
+      width: 100%;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.14);
+      overflow: hidden;
+    }
+
+    .relleno {
+      display: block;
+      height: 100%;
+      width: var(--ancho, 0%);
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--azul), var(--verde));
+      transform-origin: left center;
+      animation: crecer 0.9s var(--curva) both;
+      animation-delay: calc(var(--i, 0) * 70ms + 0.6s);
+    }
+
+    .lider .relleno { background: linear-gradient(90deg, var(--ambar), #fbbf24); }
+
+    .vacio {
+      color: var(--texto-suave);
+      text-align: center;
+      padding: 34px 26px !important;
+    }
+
+    /* ---------- Pie ---------- */
+    .pie {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 26px;
+      font-size: 0.8rem;
+      color: var(--texto-suave);
+      animation: subir 0.7s var(--curva) 0.5s both;
+    }
+
+    .pie code {
+      font-family: ui-monospace, "SF Mono", Consolas, monospace;
+      font-size: 0.78rem;
+      color: #6ee7b7;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+
+    /* ---------- Animaciones ---------- */
+    @keyframes subir {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes aparecer {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes flotar {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50%      { transform: translateY(-6px) scale(1.08); }
+    }
+
+    @keyframes latido {
+      0%   { box-shadow: 0 0 0 0 var(--verde-brillo); }
+      70%  { box-shadow: 0 0 0 9px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    @keyframes crecer {
+      from { transform: scaleX(0); }
+      to   { transform: scaleX(1); }
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--verde);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 28px 14px; }
+      .cabecera { align-items: flex-start; }
+      tbody td, thead th { padding-left: 18px; padding-right: 18px; }
+      .panel-cabecera { padding: 18px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-delay: 0ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="lienzo" aria-hidden="true"></div>
+
+  <div class="contenedor">
+    <header class="cabecera">
+      <div>
+        <p class="marca">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 2 8 0 5.5-4.8 10-10 10Z"/>
+            <path d="M2 21c0-3 1.9-5.4 5.1-6C9.5 14.5 12 13 13 12"/>
+          </svg>
+          EcoTech Solutions
+        </p>
+        <h1>Panel de Sustentabilidad</h1>
+        <p class="cabecera-sub">Huella de carbono industrial &middot; monitoreo de plantas</p>
+      </div>
+      <p class="chip"><span class="punto" aria-hidden="true"></span> Datos en vivo</p>
+    </header>
+
+    <main>
+      <section class="kpis" aria-label="Indicadores principales">
+        <article class="kpi kpi-verde">
+          <div class="kpi-superior">
+            <h2 class="kpi-titulo">Emisiones totales</h2>
+            <span class="icono icono-verde" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+                <path d="M2 12h20"/>
+              </svg>
+            </span>
+          </div>
+          <p class="kpi-valor">
+            <span class="cifra">{{ emisiones_totales|floatformat:2 }}</span>
+            <small>tCO2e</small>
+          </p>
+          <p class="kpi-pie">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <ellipse cx="12" cy="5" rx="9" ry="3"/>
+              <path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/>
+              <path d="M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/>
+            </svg>
+            {{ total_registros }} registros de consumo
+          </p>
+        </article>
+
+        <article class="kpi kpi-ambar">
+          <div class="kpi-superior">
+            <h2 class="kpi-titulo">Planta de mayor consumo</h2>
+            <span class="icono icono-ambar" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
+                <path d="M17 18h1"/><path d="M12 18h1"/><path d="M7 18h1"/>
+              </svg>
+            </span>
+          </div>
+          <p class="kpi-valor kpi-valor-texto">{{ planta_mayor_consumo }}</p>
+          <p class="kpi-pie">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+            <span class="cifra">{{ consumo_planta_lider|floatformat:0 }}</span> kWh acumulados
+          </p>
+        </article>
+
+        <article class="kpi kpi-azul">
+          <div class="kpi-superior">
+            <h2 class="kpi-titulo">Factor de emision</h2>
+            <span class="icono icono-azul" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>
+              </svg>
+            </span>
+          </div>
+          <p class="kpi-valor">
+            <span class="cifra">{{ factor_emision }}</span>
+            <small>kgCO2e/kWh</small>
+          </p>
+          <p class="kpi-pie">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+            Promedio red electrica
+          </p>
+        </article>
+      </section>
+
+      <section class="panel" aria-label="Detalle por planta">
+        <div class="panel-cabecera">
+          <h2>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="6" y1="20" x2="6" y2="16"/>
+              <line x1="12" y1="20" x2="12" y2="10"/>
+              <line x1="18" y1="20" x2="18" y2="4"/>
+            </svg>
+            Consumo y emisiones por planta
+          </h2>
+          <span class="panel-meta">{{ total_registros }} registros</span>
+        </div>
+
+        <div class="tabla-scroll">
+          <table>
+            <caption class="visualmente-oculto">Consumo y emisiones por planta</caption>
+            <thead>
+              <tr>
+                <th scope="col">Planta</th>
+                <th scope="col" class="num">Consumo (kWh)</th>
+                <th scope="col" class="num">Emisiones (tCO2e)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for fila in detalle %}
+              <tr{% if forloop.first %} class="lider"{% endif %} style="--i: {{ forloop.counter0 }}">
+                <td>
+                  <span class="planta">
+                    {{ fila.planta }}
+                    {% if forloop.first %}
+                    <span class="insignia">
+                      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M12 2l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.8 6.2 20.9l1.1-6.5L2.6 8.8l6.5-.9z"/>
+                      </svg>
+                      Mayor consumo
+                    </span>
+                    {% endif %}
+                  </span>
+                </td>
+                <td class="num">
+                  <span class="medidor">
+                    <span>{{ fila.consumo_kwh|floatformat:0 }}</span>
+                    {% widthratio fila.consumo_kwh consumo_planta_lider 100 as porcentaje %}
+                    {% if porcentaje %}
+                    <span class="pista" aria-hidden="true">
+                      <span class="relleno" style="--ancho: {{ porcentaje }}%; --i: {{ forloop.counter0 }}"></span>
+                    </span>
+                    {% endif %}
+                  </span>
+                </td>
+                <td class="num">{{ fila.emisiones|floatformat:2 }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td class="vacio" colspan="3">No hay registros de consumo disponibles.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="pie">
+      <p>Datos de prueba &middot; calculados con <code>calcular_emisiones_carbono()</code></p>
+      <p>EcoTech Solutions &copy; {% now "Y" %}</p>
+    </footer>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    (function () {
+      "use strict";
+
+      var menosMovimiento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      function formatear(valor, decimales) {
+        try {
+          return new Intl.NumberFormat("es-AR", {
+            minimumFractionDigits: decimales,
+            maximumFractionDigits: decimales
+          }).format(valor);
+        } catch (error) {
+          return String(valor);
+        }
+      }
+
+      /* Interpreta números localizados ("444440,00", "1.234,56", "1,234.56") */
+      function interpretar(texto) {
+        var limpio = texto.replace(/\s/g, "");
+        var ultimaComa = limpio.lastIndexOf(",");
+        var ultimoPunto = limpio.lastIndexOf(".");
+        if (ultimaComa === -1 && ultimoPunto === -1) return parseFloat(limpio);
+        if (ultimaComa > ultimoPunto) {
+          limpio = limpio.replace(/\./g, "").replace(",", ".");
+        } else {
+          limpio = limpio.replace(/,/g, "");
+        }
+        return parseFloat(limpio);
+      }
+
+      function decimalesDe(texto) {
+        var fin = Math.max(texto.lastIndexOf(","), texto.lastIndexOf("."));
+        return fin === -1 ? 0 : texto.length - fin - 1;
+      }
+
+      /* Conteo animado de las cifras KPI (mejora progresiva: el valor ya está renderizado) */
+      if (!menosMovimiento) {
+        Array.prototype.forEach.call(document.querySelectorAll(".cifra"), function (nodo) {
+          var texto = nodo.textContent.trim();
+          var destino = interpretar(texto);
+          if (!isFinite(destino)) return;
+          var decimales = decimalesDe(texto);
+          var inicio = null;
+          var duracion = 1100;
+
+          function animar(marca) {
+            if (inicio === null) inicio = marca;
+            var avance = Math.min((marca - inicio) / duracion, 1);
+            var suave = 1 - Math.pow(1 - avance, 3);
+            nodo.textContent = formatear(destino * suave, decimales);
+            if (avance < 1) {
+              requestAnimationFrame(animar);
+            } else {
+              nodo.textContent = formatear(destino, decimales);
+            }
+          }
+          requestAnimationFrame(animar);
+        });
+      }
+
+      /* Fondo de partículas con Three.js (decorativo, sin interferir con la interacción) */
+      function iniciarFondo() {
+        var contenedor = document.getElementById("lienzo");
+        if (!contenedor || typeof THREE === "undefined") return;
+
+        var escena = new THREE.Scene();
+        var camara = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camara.position.z = 5;
+
+        var renderizador = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderizador.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderizador.setSize(window.innerWidth, window.innerHeight);
+        contenedor.appendChild(renderizador.domElement);
+
+        var cantidad = window.innerWidth < 768 ? 350 : 700;
+        var geometria = new THREE.BufferGeometry();
+        var posiciones = new Float32Array(cantidad * 3);
+        for (var i = 0; i < posiciones.length; i++) {
+          posiciones[i] = (Math.random() - 0.5) * 15;
+        }
+        geometria.setAttribute("position", new THREE.BufferAttribute(posiciones, 3));
+
+        var material = new THREE.PointsMaterial({
+          size: 0.05,
+          color: 0x10b981,
+          transparent: true,
+          opacity: 0.75,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        });
+
+        var particulas = new THREE.Points(geometria, material);
+        escena.add(particulas);
+        renderizador.render(escena, camara);
+
+        if (menosMovimiento) return;
+
+        var mouseX = 0;
+        var mouseY = 0;
+        document.addEventListener("mousemove", function (evento) {
+          mouseX = evento.clientX / window.innerWidth - 0.5;
+          mouseY = evento.clientY / window.innerHeight - 0.5;
+        });
+
+        var reloj = new THREE.Clock();
+        (function animar() {
+          requestAnimationFrame(animar);
+          var transcurrido = reloj.getElapsedTime();
+          particulas.rotation.y = transcurrido * 0.05 + mouseX * 0.45;
+          particulas.rotation.x = transcurrido * 0.02 + mouseY * 0.45;
+          material.size = 0.05 + Math.sin(transcurrido * 2) * 0.01;
+          renderizador.render(escena, camara);
+        })();
+
+        window.addEventListener("resize", function () {
+          camara.aspect = window.innerWidth / window.innerHeight;
+          camara.updateProjectionMatrix();
+          renderizador.setSize(window.innerWidth, window.innerHeight);
+        });
+      }
+
+      iniciarFondo();
+    })();
+  </script>
+</body>
+</html>

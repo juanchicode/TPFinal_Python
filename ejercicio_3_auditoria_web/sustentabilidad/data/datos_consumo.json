@@ -1,0 +1,12 @@
+[
+  {"planta": "Planta Norte - Rosario", "mes": "2026-07", "consumo_kwh": 128500},
+  {"planta": "Planta Norte - Rosario", "mes": "2026-08", "consumo_kwh": 131200},
+  {"planta": "Planta Sur - Bahia Blanca", "mes": "2026-07", "consumo_kwh": 98700},
+  {"planta": "Planta Sur - Bahia Blanca", "mes": "2026-08", "consumo_kwh": 101450},
+  {"planta": "Planta Centro - Cordoba", "mes": "2026-07", "consumo_kwh": 117300},
+  {"planta": "Planta Centro - Cordoba", "mes": "2026-08", "consumo_kwh": 119800},
+  {"planta": "Planta Cuyo - Mendoza", "mes": "2026-07", "consumo_kwh": 84600},
+  {"planta": "Planta Cuyo - Mendoza", "mes": "2026-08", "consumo_kwh": 87250},
+  {"planta": "Planta Norte - Rosario", "mes": "2026-09", "consumo_kwh": 126900},
+  {"planta": "Planta Centro - Cordoba", "mes": "2026-09", "consumo_kwh": 115400}
+]

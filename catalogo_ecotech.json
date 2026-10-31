@@ -1,0 +1,27 @@
+[
+  {
+    "tipo": "DispositivoEcológico",
+    "nombre": "Termotanque Solar 150L",
+    "precio": 289999.0,
+    "stock": 12,
+    "material": "Acero inoxidable"
+  },
+  {
+    "tipo": "PanelSolar",
+    "nombre": "Panel Monocristalino 450Wp",
+    "precio": 189999.0,
+    "stock": 40,
+    "material": "Silicio",
+    "potencia_wp": 450,
+    "eficiencia": 21.5
+  },
+  {
+    "tipo": "PanelSolar",
+    "nombre": "Panel Policristalino 330Wp",
+    "precio": 129999.0,
+    "stock": 25,
+    "material": "Silicio",
+    "potencia_wp": 330,
+    "eficiencia": 17.8
+  }
+]
