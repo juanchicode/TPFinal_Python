@@ -71,7 +71,7 @@ TPFinal_Python/
 Clonar el repositorio y crear el entorno virtual:
 
 ```bash
-git clone <url-del-repositorio>
+git clone https://github.com/juanchicode/TPFinal_Python.git
 cd TPFinal_Python
 
 python -m venv .venv
